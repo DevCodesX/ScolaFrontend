@@ -6,9 +6,11 @@ interface UserTableProps<T extends Teacher | Student> {
   users: T[];
   type: 'teacher' | 'student';
   title: string;
+  onEdit?: (user: T) => void;
+  onDelete?: (user: T) => void;
 }
 
-export function UserTable<T extends Teacher | Student>({ users, type, title }: UserTableProps<T>) {
+export function UserTable<T extends Teacher | Student>({ users, type, title, onEdit, onDelete }: UserTableProps<T>) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
 
@@ -158,10 +160,16 @@ export function UserTable<T extends Teacher | Student>({ users, type, title }: U
                 )}
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-2">
-                    <button className="p-2 hover:bg-blue-50 rounded-lg transition-colors text-blue-600">
+                    <button
+                      onClick={() => onEdit?.(user)}
+                      className="p-2 hover:bg-blue-50 rounded-lg transition-colors text-blue-600"
+                    >
                       <Edit className="w-4 h-4" />
                     </button>
-                    <button className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-600">
+                    <button
+                      onClick={() => onDelete?.(user)}
+                      className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-600"
+                    >
                       <Trash2 className="w-4 h-4" />
                     </button>
                     <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600">

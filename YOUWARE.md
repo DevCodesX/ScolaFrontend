@@ -54,7 +54,7 @@ src/
 
 ### Key Features (MVP)
 1. **Dashboard**: Statistics overview with metrics cards
-2. **User Management**: Teachers and students listing with search/filter
+2. **User Management**: Teachers with full CRUD (add, edit, delete with confirmation) and students listing with search/filter
 3. **Institution Management**: Institution profile form
 4. **Classroom Management**: Visual classroom cards with capacity tracking
 5. **Weekly Schedule**: Interactive schedule grid with day/week views

@@ -1,26 +1,43 @@
 import React, { useState } from 'react';
-import { Building2, Mail, Phone, MapPin, Save } from 'lucide-react';
-import { mockInstitution } from '../../data/mockData';
-import type { Institution } from '../../types';
+import { Building2, MapPin, Globe } from 'lucide-react';
 
-export function InstitutionForm() {
-  const [institution, setInstitution] = useState<Omit<Institution, 'id' | 'createdAt' | 'adminId'>>({
-    name: mockInstitution.name,
-    email: mockInstitution.email,
-    phone: mockInstitution.phone,
-    address: mockInstitution.address,
-    logo: mockInstitution.logo,
+// Institution type definition
+type Institution = {
+  id: string;
+  name: string;
+  country?: string;
+  city?: string;
+  address?: string;
+};
+
+// Component props definition
+type InstitutionFormProps = {
+  institution: Institution;
+  onSave: (data: Partial<Institution>) => Promise<void>;
+};
+
+export function InstitutionForm({ institution, onSave }: InstitutionFormProps) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({
+    name: institution?.name ?? "",
+    country: institution?.country ?? "",
+    city: institution?.city ?? "",
+    address: institution?.address ?? "",
   });
 
-  const [isSaving, setIsSaving] = useState(false);
+  // Loading check - show message if data is not ready
+  if (!institution) {
+    return <p>Loading institution data...</p>;
+  }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSaving(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsSaving(false);
-    alert('تم حفظ بيانات المؤسسة بنجاح');
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async () => {
+    await onSave(formData);
+    setIsEditing(false);
   };
 
   return (
@@ -37,7 +54,7 @@ export function InstitutionForm() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="p-6 space-y-6">
+      <div className="p-6 space-y-6">
         {/* Institution Name */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -47,47 +64,47 @@ export function InstitutionForm() {
             <Building2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
-              value={institution.name}
-              onChange={(e) => setInstitution({ ...institution, name: e.target.value })}
-              className="w-full pr-10 pl-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-              placeholder="أدخل اسم المؤسسة"
-              required
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              disabled={!isEditing}
+              className={`w-full pr-10 pl-4 py-3 border border-gray-200 rounded-xl ${!isEditing ? 'bg-gray-50 cursor-not-allowed' : 'bg-white'}`}
             />
           </div>
         </div>
 
-        {/* Email */}
+        {/* Country */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            البريد الإلكتروني
+            الدولة
           </label>
           <div className="relative">
-            <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Globe className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
-              type="email"
-              value={institution.email}
-              onChange={(e) => setInstitution({ ...institution, email: e.target.value })}
-              className="w-full pr-10 pl-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-              placeholder="example@school.com"
-              required
+              type="text"
+              name="country"
+              value={formData.country}
+              onChange={handleChange}
+              disabled={!isEditing}
+              className={`w-full pr-10 pl-4 py-3 border border-gray-200 rounded-xl ${!isEditing ? 'bg-gray-50 cursor-not-allowed' : 'bg-white'}`}
             />
           </div>
         </div>
 
-        {/* Phone */}
+        {/* City */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            رقم الهاتف
+            المدينة
           </label>
           <div className="relative">
-            <Phone className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
-              type="tel"
-              value={institution.phone}
-              onChange={(e) => setInstitution({ ...institution, phone: e.target.value })}
-              className="w-full pr-10 pl-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-              placeholder="+966 XX XXX XXXX"
-              required
+              type="text"
+              name="city"
+              value={formData.city}
+              onChange={handleChange}
+              disabled={!isEditing}
+              className={`w-full pr-10 pl-4 py-3 border border-gray-200 rounded-xl ${!isEditing ? 'bg-gray-50 cursor-not-allowed' : 'bg-white'}`}
             />
           </div>
         </div>
@@ -100,26 +117,54 @@ export function InstitutionForm() {
           <div className="relative">
             <MapPin className="absolute right-3 top-3 w-5 h-5 text-gray-400" />
             <textarea
-              value={institution.address}
-              onChange={(e) => setInstitution({ ...institution, address: e.target.value })}
-              className="w-full pr-10 pl-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none"
-              placeholder="أدخل العنوان الكامل"
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              disabled={!isEditing}
+              className={`w-full pr-10 pl-4 py-3 border border-gray-200 rounded-xl resize-none ${!isEditing ? 'bg-gray-50 cursor-not-allowed' : 'bg-white'}`}
               rows={3}
-              required
             />
           </div>
         </div>
 
-        {/* Submit Button */}
-        <button
-          type="submit"
-          disabled={isSaving}
-          className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-6 rounded-xl font-medium hover:from-blue-700 hover:to-indigo-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <Save className="w-5 h-5" />
-          {isSaving ? 'جاري الحفظ...' : 'حفظ التغييرات'}
-        </button>
-      </form>
+        {/* Control Buttons */}
+        <div className="flex gap-3 mt-4">
+          {!isEditing && (
+            <button
+              onClick={() => setIsEditing(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded"
+            >
+              Edit
+            </button>
+          )}
+
+          {isEditing && (
+            <>
+              <button
+                onClick={handleSubmit}
+                className="px-4 py-2 bg-green-600 text-white rounded"
+              >
+                Save modifications
+              </button>
+
+              <button
+                onClick={() => {
+                  setFormData({
+                    name: institution.name ?? "",
+                    country: institution.country ?? "",
+                    city: institution.city ?? "",
+                    address: institution.address ?? "",
+                  });
+                  setIsEditing(false);
+                }}
+                className="px-4 py-2 bg-gray-300 rounded"
+              >
+                cancellation
+              </button>
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

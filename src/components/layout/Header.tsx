@@ -1,6 +1,5 @@
 import React from "react";
 import { Menu, Bell, Search, User } from 'lucide-react';
-import { mockInstitution } from '../../data/mockData';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -34,8 +33,8 @@ export function Header({ onMenuClick }: HeaderProps) {
       <div className="flex items-center gap-4">
         {/* Institution name */}
         <div className="hidden md:block text-left">
-          <p className="text-sm font-medium text-gray-900">{mockInstitution.name}</p>
-          <p className="text-xs text-gray-500">المؤسسة الحالية</p>
+          <p className="text-sm font-medium text-gray-500">—</p>
+          <p className="text-xs text-gray-400">المؤسسة الحالية</p>
         </div>
 
         {/* Notifications */}

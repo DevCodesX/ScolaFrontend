@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import { ChevronRight, ChevronLeft } from 'lucide-react';
-import { mockTeachers, mockClassrooms } from '../../data/mockData';
-import type { ScheduleEvent } from '../../types';
+import { ChevronRight, ChevronLeft, Calendar } from 'lucide-react';
+import type { ScheduleEvent, Teacher, Classroom } from '../../types';
 import { DAYS_OF_WEEK_AR, TIME_SLOTS } from '../../types';
+import { EmptyState } from '../common';
 
 interface ScheduleGridProps {
   events: ScheduleEvent[];
   selectedClassroom?: string;
+  teachers?: Teacher[];
+  classrooms?: Classroom[];
 }
 
-export function ScheduleGrid({ events, selectedClassroom }: ScheduleGridProps) {
+export function ScheduleGrid({ events, selectedClassroom, teachers = [], classrooms = [] }: ScheduleGridProps) {
   const [viewMode, setViewMode] = useState<'week' | 'day'>('week');
   const [currentDay, setCurrentDay] = useState(0);
 
@@ -28,12 +30,25 @@ export function ScheduleGrid({ events, selectedClassroom }: ScheduleGridProps) {
 
   // Get teacher name
   const getTeacherName = (teacherId: string) => {
-    const teacher = mockTeachers.find((t) => t.id === teacherId);
+    const teacher = teachers.find((t) => t.id === teacherId);
     return teacher?.name || 'غير محدد';
   };
 
   // Working days (Sunday to Thursday)
   const workingDays = [0, 1, 2, 3, 4]; // Sunday to Thursday
+
+  // Show empty state if no events
+  if (events.length === 0) {
+    return (
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+        <EmptyState
+          title="لا يوجد جدول بعد"
+          description="ابدأ بإضافة الحصص الدراسية لعرض الجدول الأسبوعي"
+          icon={<Calendar className="w-10 h-10 text-gray-400" />}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -44,26 +59,28 @@ export function ScheduleGrid({ events, selectedClassroom }: ScheduleGridProps) {
 
           <div className="flex items-center gap-3">
             {/* Classroom filter */}
-            <select
-              className="px-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              value={selectedClassroom || ''}
-              onChange={(e) => {/* Handle classroom change */ }}
-            >
-              <option value="">جميع الصفوف</option>
-              {mockClassrooms.map((classroom) => (
-                <option key={classroom.id} value={classroom.id}>
-                  {classroom.name}
-                </option>
-              ))}
-            </select>
+            {classrooms.length > 0 && (
+              <select
+                className="px-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                value={selectedClassroom || ''}
+                onChange={(e) => {/* Handle classroom change */ }}
+              >
+                <option value="">جميع الصفوف</option>
+                {classrooms.map((classroom) => (
+                  <option key={classroom.id} value={classroom.id}>
+                    {classroom.name}
+                  </option>
+                ))}
+              </select>
+            )}
 
             {/* View mode toggle */}
             <div className="flex items-center bg-gray-100 rounded-xl p-1">
               <button
                 onClick={() => setViewMode('week')}
                 className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${viewMode === 'week'
-                    ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white text-blue-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
                   }`}
               >
                 أسبوعي
@@ -71,8 +88,8 @@ export function ScheduleGrid({ events, selectedClassroom }: ScheduleGridProps) {
               <button
                 onClick={() => setViewMode('day')}
                 className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${viewMode === 'day'
-                    ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white text-blue-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
                   }`}
               >
                 يومي

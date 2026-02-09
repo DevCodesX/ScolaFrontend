@@ -1,14 +1,13 @@
 import React from "react";
 import { Users, BookOpen, MoreVertical, Edit, Trash2 } from 'lucide-react';
-import { mockTeachers } from '../../data/mockData';
-import type { Classroom } from '../../types';
+import type { Classroom, Teacher } from '../../types';
 
 interface ClassroomCardProps {
   classroom: Classroom;
+  teacher?: Teacher;
 }
 
-export function ClassroomCard({ classroom }: ClassroomCardProps) {
-  const teacher = mockTeachers.find((t) => t.id === classroom.teacherId);
+export function ClassroomCard({ classroom, teacher }: ClassroomCardProps) {
   const capacityPercentage = (classroom.studentCount / classroom.capacity) * 100;
 
   return (

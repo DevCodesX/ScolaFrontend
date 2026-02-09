@@ -12,12 +12,16 @@ export interface User {
   createdAt: Date;
 }
 
-// Teacher specific interface
-export interface Teacher extends User {
-  role: 'teacher';
-  subjects: string[];
-  classroomIds: string[];
-}
+// Teacher type matching backend
+export type Teacher = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  subjects: string[]; // Frontend only
+  institution_id: string;
+  created_at?: string;
+};
 
 // Student specific interface
 export interface Student extends User {

@@ -1,7 +1,14 @@
 export { Dashboard } from './Dashboard';
 export { InstitutionPage } from './InstitutionPage';
+export { InstitutionsPage } from './InstitutionsPage';
 export { TeachersPage } from './TeachersPage';
 export { StudentsPage } from './StudentsPage';
 export { ClassroomsPage } from './ClassroomsPage';
 export { SchedulePage } from './SchedulePage';
 export { SettingsPage } from './SettingsPage';
+export { LoginPage } from './LoginPage';
+export { TeacherDashboard } from './TeacherDashboard';
+export { AttendancePage } from './AttendancePage';
+export { GradesPage } from './GradesPage';
+export { TeacherTimetablePage } from './TeacherTimetablePage';
+export { AdminTimetablePage } from './AdminTimetablePage';

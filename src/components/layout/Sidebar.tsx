@@ -7,23 +7,35 @@ import {
   Building2,
   ClipboardCheck,
   Settings,
-  LogOut
+  LogOut,
+  CheckSquare,
+  Award,
+  Calendar
 } from 'lucide-react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { clsx } from 'clsx';
+import { getUser, logout } from '../../services/authService';
 
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const navItems = [
+const adminNavItems = [
   { icon: LayoutDashboard, label: 'لوحة التحكم', path: '/' },
   { icon: Building2, label: 'المؤسسة', path: '/institution' },
   { icon: Users, label: 'المعلمون', path: '/teachers' },
   { icon: GraduationCap, label: 'الطلاب', path: '/students' },
   { icon: CalendarDays, label: 'الصفوف', path: '/classrooms' },
-  { icon: ClipboardCheck, label: 'الجدول الأسبوعي', path: '/schedule' },
+  { icon: Calendar, label: 'الجدول الأسبوعي', path: '/timetable' },
+  { icon: ClipboardCheck, label: 'الجدول القديم', path: '/schedule' },
+];
+
+const teacherNavItems = [
+  { icon: LayoutDashboard, label: 'لوحة التحكم', path: '/teacher' },
+  { icon: CheckSquare, label: 'الحضور', path: '/teacher/attendance' },
+  { icon: Award, label: 'الدرجات', path: '/teacher/grades' },
+  { icon: Calendar, label: 'جدولي', path: '/teacher/timetable' },
 ];
 
 const bottomNavItems = [
@@ -31,6 +43,16 @@ const bottomNavItems = [
 ];
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
+  const navigate = useNavigate();
+  const user = getUser();
+  const isTeacher = user?.role === 'teacher';
+  const navItems = isTeacher ? teacherNavItems : adminNavItems;
+
+  function handleLogout() {
+    logout();
+    navigate('/login');
+  }
+
   return (
     <>
       {/* Mobile overlay */}
@@ -60,8 +82,20 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           </div>
         </div>
 
+        {/* Role badge */}
+        <div className="px-4 py-2 border-b border-gray-100">
+          <div className={clsx(
+            "text-xs font-medium text-center py-1 px-2 rounded-full",
+            isTeacher
+              ? "bg-green-100 text-green-700"
+              : "bg-blue-100 text-blue-700"
+          )}>
+            {isTeacher ? '👨‍🏫 معلم' : '👮 مدير'}
+          </div>
+        </div>
+
         {/* Navigation */}
-        <nav className="p-4 flex flex-col h-[calc(100%-4rem)]">
+        <nav className="p-4 flex flex-col h-[calc(100%-8rem)]">
           <div className="flex-1 space-y-1">
             {navItems.map((item) => (
               <NavLink
@@ -85,7 +119,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
           {/* Bottom navigation */}
           <div className="border-t border-gray-200 pt-4 space-y-1">
-            {bottomNavItems.map((item) => (
+            {!isTeacher && bottomNavItems.map((item) => (
               <NavLink
                 key={item.path}
                 to={item.path}
@@ -103,7 +137,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 <span>{item.label}</span>
               </NavLink>
             ))}
-            <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-all duration-200">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-all duration-200"
+            >
               <LogOut className="w-5 h-5" />
               <span>تسجيل الخروج</span>
             </button>

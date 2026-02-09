@@ -1,6 +1,6 @@
 import React from "react";
-import { mockScheduleEvents } from '../data/mockData';
-import { ScheduleGrid } from '../components/schedule';
+import { Calendar } from 'lucide-react';
+import { EmptyState } from '../components/common';
 
 export function SchedulePage() {
   return (
@@ -11,8 +11,14 @@ export function SchedulePage() {
         <p className="text-gray-500 mt-1">عرض وإدارة الجدول الدراسي الأسبوعي</p>
       </div>
 
-      {/* Schedule Grid */}
-      <ScheduleGrid events={mockScheduleEvents} />
+      {/* Schedule Grid - Empty State */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+        <EmptyState
+          title="لا يوجد جدول بعد"
+          description="ابدأ بإضافة الحصص الدراسية لعرض الجدول الأسبوعي"
+          icon={<Calendar className="w-10 h-10 text-gray-400" />}
+        />
+      </div>
     </div>
   );
 }
