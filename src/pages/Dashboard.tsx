@@ -6,9 +6,6 @@ import {
   ChevronLeft,
   ChevronRight,
   MapPin,
-  FlaskConical,
-  Monitor,
-  Dribbble,
   Plus,
   CalendarDays,
 } from "lucide-react";
@@ -16,8 +13,9 @@ import { getAllSlots, TimetableSlot } from "../services/timetable";
 import { getTeachers, Teacher } from "../services/teachers";
 import { getClasses, Class } from "../services/classes";
 
-// ─── Day configuration ───
-const DAYS = [
+/* ─── Constants ───────────────────────────────────────────── */
+
+const DAYS: { key: string; label: string }[] = [
   { key: "sun", label: "الأحد" },
   { key: "mon", label: "الإثنين" },
   { key: "tue", label: "الثلاثاء" },
@@ -25,11 +23,10 @@ const DAYS = [
   { key: "thu", label: "الخميس" },
   { key: "fri", label: "الجمعة" },
   { key: "sat", label: "السبت" },
-] as const;
+];
 
 const WEEKEND_DAYS = ["fri", "sat"];
 
-// Hour labels displayed in the time column
 const HOURS = [
   "08:00 ص",
   "09:00 ص",
@@ -42,92 +39,29 @@ const HOURS = [
   "04:00 م",
 ];
 
-const START_HOUR = 8; // grid starts at 08:00
-const HOUR_HEIGHT_REM = 6; // each hour = 6rem (h-24 equivalent)
+const START_HOUR = 8;
+const HOUR_PX = 96; // 96px per hour row
 
-// ─── Color palette for class blocks ───
 const COLORS = [
-  {
-    bg: "bg-blue-50 dark:bg-blue-900/20",
-    border: "border-blue-500",
-    title: "text-blue-900 dark:text-blue-100",
-    sub: "text-blue-700 dark:text-blue-300",
-    icon: "text-blue-600 dark:text-blue-400",
-  },
-  {
-    bg: "bg-emerald-50 dark:bg-emerald-900/20",
-    border: "border-emerald-500",
-    title: "text-emerald-900 dark:text-emerald-100",
-    sub: "text-emerald-700 dark:text-emerald-300",
-    icon: "text-emerald-600 dark:text-emerald-400",
-  },
-  {
-    bg: "bg-purple-50 dark:bg-purple-900/20",
-    border: "border-purple-500",
-    title: "text-purple-900 dark:text-purple-100",
-    sub: "text-purple-700 dark:text-purple-300",
-    icon: "text-purple-600 dark:text-purple-400",
-  },
-  {
-    bg: "bg-amber-50 dark:bg-amber-900/20",
-    border: "border-amber-500",
-    title: "text-amber-900 dark:text-amber-100",
-    sub: "text-amber-700 dark:text-amber-300",
-    icon: "text-amber-600 dark:text-amber-400",
-  },
-  {
-    bg: "bg-rose-50 dark:bg-rose-900/20",
-    border: "border-rose-500",
-    title: "text-rose-900 dark:text-rose-100",
-    sub: "text-rose-700 dark:text-rose-300",
-    icon: "text-rose-600 dark:text-rose-400",
-  },
-  {
-    bg: "bg-teal-50 dark:bg-teal-900/20",
-    border: "border-teal-500",
-    title: "text-teal-900 dark:text-teal-100",
-    sub: "text-teal-700 dark:text-teal-300",
-    icon: "text-teal-600 dark:text-teal-400",
-  },
-  {
-    bg: "bg-cyan-50 dark:bg-cyan-900/20",
-    border: "border-cyan-500",
-    title: "text-cyan-900 dark:text-cyan-100",
-    sub: "text-cyan-700 dark:text-cyan-300",
-    icon: "text-cyan-600 dark:text-cyan-400",
-  },
-  {
-    bg: "bg-indigo-50 dark:bg-indigo-900/20",
-    border: "border-indigo-500",
-    title: "text-indigo-900 dark:text-indigo-100",
-    sub: "text-indigo-700 dark:text-indigo-300",
-    icon: "text-indigo-600 dark:text-indigo-400",
-  },
-  {
-    bg: "bg-pink-50 dark:bg-pink-900/20",
-    border: "border-pink-500",
-    title: "text-pink-900 dark:text-pink-100",
-    sub: "text-pink-700 dark:text-pink-300",
-    icon: "text-pink-600 dark:text-pink-400",
-  },
-  {
-    bg: "bg-lime-50 dark:bg-lime-900/20",
-    border: "border-lime-500",
-    title: "text-lime-900 dark:text-lime-100",
-    sub: "text-lime-700 dark:text-lime-300",
-    icon: "text-lime-600 dark:text-lime-400",
-  },
+  { bg: "#eff6ff", border: "#3b82f6", title: "#1e3a5f", sub: "#1d4ed8", icon: "#2563eb" },
+  { bg: "#ecfdf5", border: "#10b981", title: "#064e3b", sub: "#047857", icon: "#059669" },
+  { bg: "#faf5ff", border: "#a855f7", title: "#3b0764", sub: "#7e22ce", icon: "#9333ea" },
+  { bg: "#fffbeb", border: "#f59e0b", title: "#451a03", sub: "#b45309", icon: "#d97706" },
+  { bg: "#fff1f2", border: "#f43f5e", title: "#4c0519", sub: "#be123c", icon: "#e11d48" },
+  { bg: "#f0fdfa", border: "#14b8a6", title: "#042f2e", sub: "#0f766e", icon: "#0d9488" },
+  { bg: "#ecfeff", border: "#06b6d4", title: "#083344", sub: "#0e7490", icon: "#0891b2" },
+  { bg: "#eef2ff", border: "#6366f1", title: "#1e1b4b", sub: "#4338ca", icon: "#4f46e5" },
+  { bg: "#fdf2f8", border: "#ec4899", title: "#500724", sub: "#be185d", icon: "#db2777" },
+  { bg: "#f7fee7", border: "#84cc16", title: "#1a2e05", sub: "#4d7c0f", icon: "#65a30d" },
 ];
 
-// ─── Helpers ───
+/* ─── Helpers ─────────────────────────────────────────────── */
 
-/** Parse "HH:MM" or "HH:MM:SS" into fractional hours from START_HOUR */
 function timeToOffset(time: string): number {
   const [h, m] = time.split(":").map(Number);
   return (h - START_HOUR) + m / 60;
 }
 
-/** Stable color index for a class_name */
 function hashString(str: string): number {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
@@ -137,10 +71,9 @@ function hashString(str: string): number {
   return Math.abs(hash);
 }
 
-/** Get the current week's Sunday–Saturday date range */
 function getCurrentWeekDates(): Date[] {
   const now = new Date();
-  const dayOfWeek = now.getDay(); // 0=Sun
+  const dayOfWeek = now.getDay();
   const sunday = new Date(now);
   sunday.setDate(now.getDate() - dayOfWeek);
   sunday.setHours(0, 0, 0, 0);
@@ -161,21 +94,18 @@ function formatDateRange(dates: Date[]): string {
     "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
     "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر",
   ];
-  const month = months[dates[0].getMonth()];
-  const year = dates[0].getFullYear();
-  return `${first} - ${last} ${month}, ${year}`;
+  return `${first} - ${last} ${months[dates[0].getMonth()]}, ${dates[0].getFullYear()}`;
 }
 
-/** Current time indicator position in rem from top */
 function getCurrentTimePosition(): number | null {
   const now = new Date();
   const h = now.getHours();
   const m = now.getMinutes();
   if (h < START_HOUR || h >= START_HOUR + HOURS.length) return null;
-  return ((h - START_HOUR) + m / 60) * HOUR_HEIGHT_REM;
+  return ((h - START_HOUR) + m / 60) * HOUR_PX;
 }
 
-// ─── Main Component ───
+/* ─── Component ───────────────────────────────────────────── */
 
 export function Dashboard() {
   const [slots, setSlots] = useState<TimetableSlot[]>([]);
@@ -183,36 +113,24 @@ export function Dashboard() {
   const [classes, setClasses] = useState<Class[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Filters
-  const [selectedClassId, setSelectedClassId] = useState<string>("all");
-  const [selectedTeacherId, setSelectedTeacherId] = useState<string>("all");
-  const [activeView, setActiveView] = useState<"week" | "day" | "list">("week");
-
-  // Week navigation
+  const [selectedClassId, setSelectedClassId] = useState("all");
+  const [selectedTeacherId, setSelectedTeacherId] = useState("all");
+  const [activeView, setActiveView] = useState("week");
   const [weekOffset, setWeekOffset] = useState(0);
+  const [timePos, setTimePos] = useState<number | null>(getCurrentTimePosition());
 
   useEffect(() => {
-    async function loadData() {
-      try {
-        const [slotsData, teachersData, classesData] = await Promise.all([
-          getAllSlots(),
-          getTeachers(),
-          getClasses(),
-        ]);
-        setSlots(slotsData);
-        setTeachers(teachersData);
-        setClasses(classesData);
-      } catch (err: any) {
-        setError(err.message || "حدث خطأ أثناء تحميل البيانات");
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadData();
+    Promise.all([getAllSlots(), getTeachers(), getClasses()])
+      .then(([s, t, c]) => { setSlots(s); setTeachers(t); setClasses(c); })
+      .catch((err: any) => setError(err.message || "حدث خطأ أثناء تحميل البيانات"))
+      .finally(() => setLoading(false));
   }, []);
 
-  // Get current week dates adjusted by offset
+  useEffect(() => {
+    const id = setInterval(() => setTimePos(getCurrentTimePosition()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+
   const weekDates = useMemo(() => {
     const dates = getCurrentWeekDates();
     return dates.map((d) => {
@@ -223,51 +141,40 @@ export function Dashboard() {
   }, [weekOffset]);
 
   const today = new Date();
-  const todayDayIndex = today.getDay(); // 0=Sun
+  const todayDayIndex = today.getDay();
 
-  // Filtered slots
   const filteredSlots = useMemo(() => {
-    return slots.filter((slot) => {
-      if (selectedClassId !== "all" && slot.class_id !== selectedClassId) return false;
-      if (selectedTeacherId !== "all" && slot.teacher_id !== selectedTeacherId) return false;
+    return slots.filter((s) => {
+      if (selectedClassId !== "all" && s.class_id !== selectedClassId) return false;
+      if (selectedTeacherId !== "all" && s.teacher_id !== selectedTeacherId) return false;
       return true;
     });
   }, [slots, selectedClassId, selectedTeacherId]);
 
-  // Group slots by day
   const slotsByDay = useMemo(() => {
     const map: Record<string, TimetableSlot[]> = {};
     DAYS.forEach((d) => (map[d.key] = []));
-    filteredSlots.forEach((slot) => {
-      if (map[slot.day]) map[slot.day].push(slot);
-    });
+    filteredSlots.forEach((s) => { if (map[s.day]) map[s.day].push(s); });
     return map;
   }, [filteredSlots]);
 
-  // Color mapping: assign a consistent color to each unique class_name
   const colorMap = useMemo(() => {
-    const nameSet = new Set(slots.map((s) => s.class_name));
     const m: Record<string, (typeof COLORS)[number]> = {};
-    nameSet.forEach((name) => {
+    new Set(slots.map((s) => s.class_name)).forEach((name) => {
       m[name] = COLORS[hashString(name) % COLORS.length];
     });
     return m;
   }, [slots]);
 
-  // Current time position for the indicator
-  const [timePos, setTimePos] = useState<number | null>(getCurrentTimePosition());
-  useEffect(() => {
-    const interval = setInterval(() => setTimePos(getCurrentTimePosition()), 60_000);
-    return () => clearInterval(interval);
-  }, []);
+  const gridHeight = HOURS.length * HOUR_PX;
 
-  // ─── Render ───
+  /* ─── Loading / Error ─── */
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="text-gray-500 mt-4">جاري تحميل الجدول...</p>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 400 }}>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ width: 48, height: 48, border: "3px solid #e5e7eb", borderTopColor: "#3b82f6", borderRadius: "50%", animation: "spin 1s linear infinite", margin: "0 auto" }} />
+          <p style={{ color: "#6b7280", marginTop: 16 }}>جاري تحميل الجدول...</p>
         </div>
       </div>
     );
@@ -275,13 +182,10 @@ export function Dashboard() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <p className="text-red-500">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="mt-4 text-blue-600 hover:text-blue-700"
-          >
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 400 }}>
+        <div style={{ textAlign: "center" }}>
+          <p style={{ color: "#ef4444" }}>{error}</p>
+          <button onClick={() => window.location.reload()} style={{ marginTop: 16, color: "#3b82f6", cursor: "pointer", background: "none", border: "none", fontSize: 14 }}>
             إعادة المحاولة
           </button>
         </div>
@@ -290,88 +194,78 @@ export function Dashboard() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] overflow-hidden -m-4 lg:-m-6">
+    <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 5rem)", margin: "-1rem -1rem -1.5rem -1.5rem", overflow: "hidden" }}>
       {/* ── Filters Toolbar ── */}
-      <div className="px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm z-20 flex-none">
-        {/* Left filters */}
-        <div className="flex items-center gap-3 w-full md:w-auto">
-          {/* Class filter */}
-          <div className="relative">
-            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400">
-              <Filter className="w-4 h-4" />
-            </div>
+      <div style={{
+        display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center",
+        gap: 16, padding: "12px 24px", background: "#fff", borderBottom: "1px solid #e5e7eb",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.05)", flexShrink: 0, zIndex: 20,
+      }}>
+        {/* Filters */}
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ position: "relative" }}>
+            <Filter style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", width: 16, height: 16, color: "#9ca3af", pointerEvents: "none" }} />
             <select
               value={selectedClassId}
               onChange={(e) => setSelectedClassId(e.target.value)}
-              className="appearance-none bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 py-2 pr-10 pl-8 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 w-full md:w-48 cursor-pointer"
+              style={{
+                appearance: "none", background: "#f9fafb", border: "1px solid #e5e7eb",
+                color: "#374151", padding: "8px 40px 8px 32px", borderRadius: 8,
+                fontSize: 14, cursor: "pointer", minWidth: 180,
+              }}
             >
               <option value="all">جميع الصفوف</option>
-              {classes.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
+              {classes.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
-            <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none text-gray-400">
-              <ChevronDown className="w-4 h-4" />
-            </div>
+            <ChevronDown style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", width: 16, height: 16, color: "#9ca3af", pointerEvents: "none" }} />
           </div>
-          {/* Teacher filter */}
-          <div className="relative">
-            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400">
-              <User className="w-4 h-4" />
-            </div>
+          <div style={{ position: "relative" }}>
+            <User style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", width: 16, height: 16, color: "#9ca3af", pointerEvents: "none" }} />
             <select
               value={selectedTeacherId}
               onChange={(e) => setSelectedTeacherId(e.target.value)}
-              className="appearance-none bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 py-2 pr-10 pl-8 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 w-full md:w-48 cursor-pointer"
+              style={{
+                appearance: "none", background: "#f9fafb", border: "1px solid #e5e7eb",
+                color: "#374151", padding: "8px 40px 8px 32px", borderRadius: 8,
+                fontSize: 14, cursor: "pointer", minWidth: 180,
+              }}
             >
               <option value="all">جميع المعلمين</option>
-              {teachers.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name}
-                </option>
-              ))}
+              {teachers.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
             </select>
-            <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none text-gray-400">
-              <ChevronDown className="w-4 h-4" />
-            </div>
+            <ChevronDown style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", width: 16, height: 16, color: "#9ca3af", pointerEvents: "none" }} />
           </div>
         </div>
 
-        {/* Week navigation (center) */}
-        <div className="hidden lg:flex items-center bg-gray-50 dark:bg-gray-800 rounded-lg p-1 border border-gray-100 dark:border-gray-700">
-          <button
-            onClick={() => setWeekOffset((p) => p + 1)}
-            className="p-1.5 rounded-md hover:bg-white dark:hover:bg-gray-700 hover:shadow-sm text-gray-500 transition-all"
-          >
-            <ChevronRight className="w-4 h-4" />
+        {/* Week nav */}
+        <div style={{
+          display: "flex", alignItems: "center", background: "#f9fafb",
+          borderRadius: 8, padding: 4, border: "1px solid #f3f4f6",
+        }}>
+          <button onClick={() => setWeekOffset((p) => p + 1)} style={{ padding: 6, borderRadius: 6, cursor: "pointer", background: "none", border: "none", color: "#6b7280" }}>
+            <ChevronRight style={{ width: 16, height: 16 }} />
           </button>
-          <span className="px-4 text-sm font-semibold whitespace-nowrap">
+          <span style={{ padding: "0 16px", fontSize: 14, fontWeight: 600, whiteSpace: "nowrap" }}>
             {formatDateRange(weekDates)}
           </span>
-          <button
-            onClick={() => setWeekOffset((p) => p - 1)}
-            className="p-1.5 rounded-md hover:bg-white dark:hover:bg-gray-700 hover:shadow-sm text-gray-500 transition-all"
-          >
-            <ChevronLeft className="w-4 h-4" />
+          <button onClick={() => setWeekOffset((p) => p - 1)} style={{ padding: 6, borderRadius: 6, cursor: "pointer", background: "none", border: "none", color: "#6b7280" }}>
+            <ChevronLeft style={{ width: 16, height: 16 }} />
           </button>
         </div>
 
-        {/* View toggle (right) */}
-        <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
-          {([
-            { key: "week" as const, label: "أسبوع" },
-            { key: "day" as const, label: "يوم" },
-            { key: "list" as const, label: "قائمة" },
-          ]).map((v) => (
+        {/* View toggle */}
+        <div style={{ display: "flex", background: "#f3f4f6", padding: 4, borderRadius: 8 }}>
+          {[{ key: "week", label: "أسبوع" }, { key: "day", label: "يوم" }, { key: "list", label: "قائمة" }].map((v) => (
             <button
               key={v.key}
               onClick={() => setActiveView(v.key)}
-              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${activeView === v.key
-                  ? "bg-white dark:bg-gray-700 text-blue-600 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                }`}
+              style={{
+                padding: "6px 16px", borderRadius: 6, fontSize: 14, fontWeight: 500,
+                cursor: "pointer", border: "none", transition: "all 0.2s",
+                background: activeView === v.key ? "#fff" : "transparent",
+                color: activeView === v.key ? "#2563eb" : "#6b7280",
+                boxShadow: activeView === v.key ? "0 1px 2px rgba(0,0,0,0.08)" : "none",
+              }}
             >
               {v.label}
             </button>
@@ -380,31 +274,31 @@ export function Dashboard() {
       </div>
 
       {/* ── Schedule Grid ── */}
-      <div className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900/50 relative">
-        <div className="min-w-[1000px] h-full flex flex-col p-6">
-          {/* Day headers */}
-          <div className="flex border-b border-gray-200 dark:border-gray-700 pb-2">
-            {/* Time column spacer */}
-            <div className="w-20 flex-shrink-0"></div>
-            {/* Day columns */}
-            <div className="grid grid-cols-7 flex-1 gap-4">
+      <div style={{ flex: 1, overflow: "auto", background: "#f9fafb", position: "relative" }}>
+        <div style={{ minWidth: 1000, padding: 24 }}>
+          {/* Day Headers */}
+          <div style={{ display: "flex", borderBottom: "1px solid #e5e7eb", paddingBottom: 8 }}>
+            <div style={{ width: 80, flexShrink: 0 }} />
+            <div style={{ flex: 1, display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 16 }}>
               {DAYS.map((day, i) => {
                 const isToday = weekOffset === 0 && i === todayDayIndex;
                 const isWeekend = WEEKEND_DAYS.includes(day.key);
                 return (
-                  <div key={day.key} className={`text-center group ${isWeekend ? "opacity-50" : ""}`}>
-                    <span
-                      className={`block text-xs uppercase font-bold mb-1 ${isToday ? "text-blue-600" : "text-gray-400"
-                        }`}
-                    >
+                  <div key={day.key} style={{ textAlign: "center", opacity: isWeekend ? 0.5 : 1 }}>
+                    <span style={{
+                      display: "block", fontSize: 11, fontWeight: 700, marginBottom: 4,
+                      color: isToday ? "#2563eb" : "#9ca3af", textTransform: "uppercase",
+                    }}>
                       {day.label}
                     </span>
-                    <div
-                      className={`w-8 h-8 mx-auto flex items-center justify-center rounded-full text-sm font-medium transition-colors ${isToday
-                          ? "bg-blue-600 text-white shadow-md shadow-blue-500/30 font-bold"
-                          : "text-gray-600 dark:text-gray-300 group-hover:bg-gray-100 dark:group-hover:bg-gray-800"
-                        }`}
-                    >
+                    <div style={{
+                      width: 32, height: 32, margin: "0 auto", display: "flex",
+                      alignItems: "center", justifyContent: "center", borderRadius: "50%",
+                      fontSize: 14, fontWeight: isToday ? 700 : 500, transition: "all 0.2s",
+                      background: isToday ? "#2563eb" : "transparent",
+                      color: isToday ? "#fff" : "#4b5563",
+                      boxShadow: isToday ? "0 4px 12px rgba(37,99,235,0.3)" : "none",
+                    }}>
                       {weekDates[i]?.getDate()}
                     </div>
                   </div>
@@ -413,60 +307,67 @@ export function Dashboard() {
             </div>
           </div>
 
-          {/* Schedule grid body */}
-          <div className="flex flex-1 relative mt-4">
+          {/* Grid Body */}
+          <div style={{ display: "flex", position: "relative", marginTop: 16 }}>
             {/* Time column */}
-            <div className="w-20 flex-shrink-0 flex flex-col text-xs text-gray-400 font-medium pt-3 pr-2 border-l border-gray-100 dark:border-gray-800/50">
+            <div style={{ width: 80, flexShrink: 0, borderLeft: "1px solid #f3f4f6", paddingRight: 8 }}>
               {HOURS.map((label, i) => (
-                <div
-                  key={i}
-                  style={{ height: `${HOUR_HEIGHT_REM}rem` }}
-                  className="flex-none"
-                >
+                <div key={i} style={{ height: HOUR_PX, fontSize: 12, color: "#9ca3af", fontWeight: 500, paddingTop: 4 }}>
                   {label}
                 </div>
               ))}
             </div>
 
-            {/* Grid content */}
-            <div className="flex-1 relative">
-              {/* Horizontal grid lines */}
-              <div className="absolute inset-0 flex flex-col pointer-events-none">
+            {/* Grid content area */}
+            <div style={{ flex: 1, position: "relative" }}>
+              {/* Grid lines */}
+              <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
                 {HOURS.map((_, i) => (
-                  <div
-                    key={i}
-                    style={{ height: `${HOUR_HEIGHT_REM}rem` }}
-                    className={`flex-none border-t ${i === 0
-                        ? "border-gray-200 dark:border-gray-800"
-                        : "border-gray-100 dark:border-gray-800"
-                      }`}
-                  />
+                  <div key={i} style={{
+                    height: HOUR_PX,
+                    borderTop: `1px solid ${i === 0 ? "#e5e7eb" : "#f3f4f6"}`,
+                  }} />
                 ))}
               </div>
 
               {/* Current time indicator */}
               {weekOffset === 0 && timePos !== null && (
-                <div
-                  className="absolute w-full border-t-2 border-red-500 z-10 flex items-center pointer-events-none opacity-60"
-                  style={{ top: `${timePos}rem` }}
-                >
-                  <div className="absolute -right-1.5 w-3 h-3 bg-red-500 rounded-full" />
+                <div style={{
+                  position: "absolute", top: timePos, width: "100%",
+                  borderTop: "2px solid #ef4444", zIndex: 10,
+                  pointerEvents: "none", opacity: 0.6,
+                }}>
+                  <div style={{
+                    position: "absolute", right: -6, top: -6,
+                    width: 12, height: 12, background: "#ef4444",
+                    borderRadius: "50%",
+                  }} />
                 </div>
               )}
 
-              {/* Class blocks grid */}
-              <div className="grid grid-cols-7 h-full gap-4 relative z-0">
+              {/* Day columns with class blocks */}
+              <div style={{
+                display: "grid", gridTemplateColumns: "repeat(7, 1fr)",
+                gap: 16, height: gridHeight, position: "relative", zIndex: 0,
+              }}>
                 {DAYS.map((day) => {
                   const isWeekend = WEEKEND_DAYS.includes(day.key);
 
                   if (isWeekend) {
                     return (
-                      <div
-                        key={day.key}
-                        className="relative h-full bg-gray-50/50 dark:bg-gray-800/20 rounded-lg"
-                      >
-                        <div className="absolute inset-0 flex items-center justify-center opacity-30">
-                          <span className="transform -rotate-45 text-gray-300 dark:text-gray-600 font-bold text-2xl tracking-widest whitespace-nowrap">
+                      <div key={day.key} style={{
+                        position: "relative", height: "100%",
+                        background: "rgba(249,250,251,0.5)", borderRadius: 8,
+                      }}>
+                        <div style={{
+                          position: "absolute", inset: 0, display: "flex",
+                          alignItems: "center", justifyContent: "center", opacity: 0.3,
+                        }}>
+                          <span style={{
+                            transform: "rotate(-45deg)", color: "#d1d5db",
+                            fontWeight: 700, fontSize: 20, letterSpacing: "0.1em",
+                            whiteSpace: "nowrap",
+                          }}>
                             عطلة نهاية الأسبوع
                           </span>
                         </div>
@@ -477,36 +378,44 @@ export function Dashboard() {
                   const daySlots = slotsByDay[day.key] || [];
 
                   return (
-                    <div key={day.key} className="relative h-full">
+                    <div key={day.key} style={{ position: "relative", height: "100%" }}>
                       {daySlots.map((slot) => {
                         const topOffset = timeToOffset(slot.start_time);
                         const endOffset = timeToOffset(slot.end_time);
-                        const height = endOffset - topOffset;
+                        const heightHours = endOffset - topOffset;
                         const color = colorMap[slot.class_name] || COLORS[0];
 
                         return (
                           <div
                             key={slot.id}
-                            className={`absolute w-full ${color.bg} border-r-4 ${color.border} rounded-lg p-3 hover:shadow-md transition-shadow cursor-pointer`}
                             style={{
-                              top: `${topOffset * HOUR_HEIGHT_REM}rem`,
-                              height: `${height * HOUR_HEIGHT_REM}rem`,
+                              position: "absolute", width: "100%",
+                              top: topOffset * HOUR_PX,
+                              height: heightHours * HOUR_PX,
+                              background: color.bg,
+                              borderRight: `4px solid ${color.border}`,
+                              borderRadius: 8, padding: 12,
+                              cursor: "pointer",
+                              transition: "box-shadow 0.2s",
+                              overflow: "hidden",
                             }}
+                            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)"; }}
+                            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}
                           >
-                            <div className="flex flex-col h-full justify-between overflow-hidden">
+                            <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%" }}>
                               <div>
-                                <p className={`font-bold ${color.title} text-sm leading-tight`}>
+                                <p style={{ fontWeight: 700, color: color.title, fontSize: 14, lineHeight: 1.3, margin: 0 }}>
                                   {slot.class_name}
                                 </p>
                                 {slot.teacher_name && (
-                                  <p className={`text-xs ${color.sub} mt-1`}>
+                                  <p style={{ fontSize: 12, color: color.sub, marginTop: 4, margin: "4px 0 0 0" }}>
                                     {slot.teacher_name}
                                   </p>
                                 )}
                               </div>
-                              {height * HOUR_HEIGHT_REM >= 6 && (
-                                <div className={`flex items-center gap-1 text-xs ${color.icon}`}>
-                                  <MapPin className="w-3 h-3" />
+                              {heightHours * HOUR_PX >= 80 && (
+                                <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, color: color.icon }}>
+                                  <MapPin style={{ width: 12, height: 12 }} />
                                   <span>{slot.class_name}</span>
                                 </div>
                               )}
@@ -522,30 +431,51 @@ export function Dashboard() {
           </div>
         </div>
 
-        {/* Empty state — no slots at all */}
+        {/* Empty state */}
         {filteredSlots.length === 0 && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="text-center pointer-events-auto bg-white/80 dark:bg-gray-900/80 backdrop-blur rounded-2xl p-8 shadow-lg max-w-sm">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CalendarDays className="w-8 h-8 text-blue-600" />
+          <div style={{
+            position: "absolute", inset: 0, display: "flex",
+            alignItems: "center", justifyContent: "center",
+            pointerEvents: "none",
+          }}>
+            <div style={{
+              textAlign: "center", pointerEvents: "auto",
+              background: "rgba(255,255,255,0.9)", backdropFilter: "blur(8px)",
+              borderRadius: 16, padding: 32, boxShadow: "0 8px 24px rgba(0,0,0,0.1)",
+              maxWidth: 360,
+            }}>
+              <div style={{
+                width: 64, height: 64, background: "#dbeafe", borderRadius: "50%",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                margin: "0 auto 16px",
+              }}>
+                <CalendarDays style={{ width: 32, height: 32, color: "#2563eb" }} />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              <h3 style={{ fontSize: 20, fontWeight: 600, color: "#111827", marginBottom: 8 }}>
                 لا توجد حصص
               </h3>
-              <p className="text-gray-500 dark:text-gray-400 mb-4 text-sm">
+              <p style={{ color: "#6b7280", marginBottom: 16, fontSize: 14 }}>
                 لم يتم إضافة أي حصص إلى الجدول بعد. ابدأ بإضافة حصة جديدة.
               </p>
               <a
                 href="#/timetable"
-                className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl font-medium hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/25 text-sm"
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: 8,
+                  background: "#2563eb", color: "#fff", padding: "10px 16px",
+                  borderRadius: 12, fontWeight: 500, fontSize: 14,
+                  textDecoration: "none", boxShadow: "0 4px 12px rgba(37,99,235,0.25)",
+                }}
               >
-                <Plus className="w-4 h-4" />
+                <Plus style={{ width: 16, height: 16 }} />
                 إضافة حصة
               </a>
             </div>
           </div>
         )}
       </div>
+
+      {/* Keyframe for spinner */}
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }
