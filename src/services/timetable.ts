@@ -1,4 +1,4 @@
-const API = "http://localhost:4000/api/timetable";
+const API = `${import.meta.env.VITE_API_URL}/api/timetable`;
 
 export interface TimetableSlot {
     id: string;

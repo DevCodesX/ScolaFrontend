@@ -1,4 +1,4 @@
-const API = "http://localhost:4000/api/attendance";
+const API = `${import.meta.env.VITE_API_URL}/api/attendance`;
 
 export async function getClassAttendance(classId: string, date?: string) {
     const q = date ? `?date=${date}` : "";

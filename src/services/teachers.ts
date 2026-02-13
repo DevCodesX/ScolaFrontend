@@ -2,7 +2,7 @@ import { Teacher } from "../types";
 export type { Teacher };
 import { getAuthHeaders } from "./authService";
 
-const API_URL = "http://localhost:4000/api/teachers";
+const API_URL = `${import.meta.env.VITE_API_URL}/api/teachers`;
 
 export async function getTeachers(): Promise<Teacher[]> {
     const res = await fetch(API_URL, {

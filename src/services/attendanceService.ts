@@ -1,6 +1,6 @@
 import { getAuthHeaders } from "./authService";
 
-const API_URL = "http://localhost:4000/api/attendance";
+const API_URL = `${import.meta.env.VITE_API_URL}/api/attendance`;
 
 export interface AttendanceRecord {
     student_id: string;
