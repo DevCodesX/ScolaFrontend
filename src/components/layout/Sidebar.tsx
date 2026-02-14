@@ -10,7 +10,9 @@ import {
   LogOut,
   CheckSquare,
   Award,
-  Calendar
+  Calendar,
+  BookOpen,
+  BookMarked
 } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { clsx } from 'clsx';
@@ -29,6 +31,7 @@ const adminNavItems = [
   { icon: CalendarDays, label: 'الصفوف', path: '/classrooms' },
   { icon: Calendar, label: 'الجدول الأسبوعي', path: '/timetable' },
   { icon: ClipboardCheck, label: 'الجدول القديم', path: '/schedule' },
+  { icon: BookOpen, label: 'الدورات', path: '/courses' },
 ];
 
 const teacherNavItems = [
@@ -36,6 +39,8 @@ const teacherNavItems = [
   { icon: CheckSquare, label: 'الحضور', path: '/teacher/attendance' },
   { icon: Award, label: 'الدرجات', path: '/teacher/grades' },
   { icon: Calendar, label: 'جدولي', path: '/teacher/timetable' },
+  { icon: BookOpen, label: 'الدورات', path: '/courses' },
+  { icon: BookMarked, label: 'اشتراكاتي', path: '/subscriptions' },
 ];
 
 const bottomNavItems = [

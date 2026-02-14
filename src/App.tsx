@@ -16,7 +16,9 @@ import {
   AttendancePage,
   GradesPage,
   TeacherTimetablePage,
-  AdminTimetablePage
+  AdminTimetablePage,
+  CoursesPage,
+  SubscriptionsPage
 } from './pages';
 
 // Protected Route component
@@ -79,6 +81,8 @@ function App() {
           <Route path="/schedule" element={<AdminRoute><SchedulePage /></AdminRoute>} />
           <Route path="/timetable" element={<AdminRoute><AdminTimetablePage /></AdminRoute>} />
           <Route path="/settings" element={<AdminRoute><SettingsPage /></AdminRoute>} />
+          <Route path="/courses" element={<CoursesPage />} />
+          <Route path="/subscriptions" element={<SubscriptionsPage />} />
 
           {/* Teacher routes */}
           <Route path="/teacher" element={<TeacherRoute><TeacherDashboard /></TeacherRoute>} />

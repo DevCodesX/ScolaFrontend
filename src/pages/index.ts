@@ -12,3 +12,5 @@ export { AttendancePage } from './AttendancePage';
 export { GradesPage } from './GradesPage';
 export { TeacherTimetablePage } from './TeacherTimetablePage';
 export { AdminTimetablePage } from './AdminTimetablePage';
+export { CoursesPage } from './CoursesPage';
+export { SubscriptionsPage } from './SubscriptionsPage';
