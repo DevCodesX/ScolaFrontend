@@ -12,6 +12,7 @@ dist/
 # IDE
 .vscode/
 .idea/
+.vs/
 
 # OS files
 .DS_Store
@@ -20,8 +21,10 @@ Thumbs.db
 # Logs
 *.log
 
-# Backend folder (separate repo)
-scola-backend/
-
 # Misc
 New Text Document.txt
+yw_manifest.json
+YOUWARE.md
+
+# Ignore backend repo
+/scola-backend
